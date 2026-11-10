@@ -85,8 +85,9 @@ python check.py                                          # test your keys
 
 **For judges**
 
-- Live demo: [Render link: add after deploying]
+- Live demo: https://alibi-0tv9.onrender.com
 - No login is needed. The site runs on the PayPal sandbox, so no real money moves.
+- It is hosted on a free plan that sleeps when idle: the first visit can take up to a minute to load, and the ledger starts empty after a restart.
 - The **Obedient** agent always works and shows the worst case. The **Gemini** agent is a real model and is subject to free-tier rate limits.
 
 ## Project structure
@@ -138,7 +139,7 @@ The two numbers answer different questions. The real-model run shows how often t
 
 ## Demo and live link
 
-- Live site: [Render link: add after deploying]
+- Live site: https://alibi-0tv9.onrender.com
 - Video: [YouTube link: add before submitting]
 - Devpost: [Devpost link: add after submitting]
 

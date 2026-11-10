@@ -67,4 +67,6 @@ def test_custom_trap_page():
 
 def test_config_lists_shops():
     cfg = client.get("/api/config").json()
-    assert {s["id"] for s in cfg["shops"]} >= {"honest", "fake-review", "split-address"}
+    ids = [s["id"] for s in cfg["shops"]]
+    assert set(ids) >= {"honest", "fake-review", "split-address"}
+    assert len(ids) == len(set(ids)) == 11, "each shop listed exactly once"

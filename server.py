@@ -126,8 +126,9 @@ def config():
         "paypal": "sandbox" if isinstance(PAYPAL, PayPal) else "simulated",
         "gemini": bool(os.environ.get("GEMINI_API_KEY")),
         "model": os.environ.get("GEMINI_MODEL", "gemini-flash-latest"),
+        # "poisoned" is an old alias for ai-notice, so skip it by key to avoid listing that shop twice
         "shops": [{"id": s.name, "kind": s.kind, "trick": s.trick, "page": s.page}
-                  for s in store.SCENARIOS.values() if s.name != "poisoned"],
+                  for key, s in store.SCENARIOS.items() if key != "poisoned"],
         "catalog": store.CATALOG,
         "request": store.REQUEST,
         "base_page": store._BASE,
