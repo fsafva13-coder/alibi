@@ -149,7 +149,7 @@ The two columns answer different questions. The real-model run shows that a capa
 
 - Live site: https://alibi-0tv9.onrender.com
 - Video: https://youtu.be/j9afxQUzHN4
-- Devpost: [Devpost link: add after submitting]
+- Devpost: https://devpost.com/software/alibi-blnegr
 
 ## License
 
