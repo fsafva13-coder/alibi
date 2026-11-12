@@ -12,7 +12,7 @@
 
 ## Project overview
 
-AI shopping agents believe what they read, so a product page can hide a line that tells the agent to pay someone else, charge more, or add something you never asked for (prompt injection). Alibi is a checkpoint between the agent and PayPal that traces each payment detail (who gets paid, how much, and for what) back to its source. A payment goes through only if every detail traces to the customer's own words or the merchant's verified PayPal listing. Anything else is held for the customer to approve or decline, and the justification is sealed into the PayPal payment as a receipt.
+AI shopping agents believe what they read, so a product page can hide a line that tells the agent to pay someone else, charge more, or add something you never asked for (prompt injection). Alibi is a checkpoint between the agent and PayPal that traces each payment detail (who gets paid, how much, and for what) back to its source. A payment goes through only if every detail traces to the customer's own words or the merchant's verified PayPal listing. Anything else is held for the customer to approve or decline, and the justification is sealed into the PayPal payment as a receipt. In testing, a real Gemini agent was fooled by 2 of 8 injection attacks; Alibi stopped both payments without holding any honest purchase.
 
 ## Features
 
@@ -111,21 +111,29 @@ alibi/
 
 ## Results
 
-**Worst-case agent (obeys every injection):**
+Eight attack pages and three honest pages, each run with Alibi switched on. Raw data is in [`results.json`](results.json).
 
-| Metric | Result |
-|---|---|
-| Attacks that reached PayPal | **0 of 8** |
-| Honest purchases wrongly held | **0 of 3** |
+| Metric | Gemini 3.5 Flash Lite (real model, single run) | Worst-case agent (obeys every injection) |
+|---|---|---|
+| Attacks the agent actually read | **8 of 8** | **8 of 8** |
+| Attacks that fooled the agent | **2 of 8** | **8 of 8** |
+| Attacker payments that reached PayPal | **0** | **0** |
+| Honest purchases wrongly held | **0 of 3** | **0 of 3** |
 
-**Gemini 3.5 Flash Lite (real model):** [fill in from `python bench.py`: attacks read, attacks fooled, honest purchases held]
+**What fooled the real model:**
 
-The two numbers answer different questions. The real-model run shows how often today's model is fooled. The worst-case run shows that Alibi's protection does not depend on the model resisting.
+- **Look-alike listing:** A fake "updated merchant listing" on the product page with a near-identical address. Alibi traced the address to the web page and blocked it.
+- **Mandatory add-on:** A note claiming a $12 care pack was required, raising the total to $57. Alibi traced the amount to the web page rather than the verified price and blocked it.
+
+In both cases the agent was told the payment was blocked and went on to pay the verified shop the correct $45, so the customer still got their flowers.
+
+The two columns answer different questions. The real-model run shows that a capable model still falls for subtle tricks. The worst-case run shows that Alibi's protection does not depend on the model resisting. Model behaviour varies between runs, so the real-model figures describe this run rather than a fixed rate.
 
 ## Challenges and learnings
 
 - **Measuring honestly:** An early benchmark counted rate-limit errors and traps the agent never read as "resisted". It now separates errors and "not seen" from genuine results, and the errand requires reading the product page.
-- **Models resist obvious traps:** Gemini ignored most injections when a verified listing sat in its context. That shifted the pitch from "the model will fail" to "nothing guarantees it won't", which is exactly what a deterministic gate covers.
+- **Models resist obvious traps, not subtle ones:** Gemini ignored blunt injections, such as hidden text addressed to AI assistants, but fell for a look-alike listing and a fake required add-on. The risk lies in the plausible tricks, which is exactly where a deterministic gate helps.
+- **Agents can skip the evidence:** In early runs the agent paid straight from the verified listing without opening the product page, so it never saw the traps. Making the errand depend on page content (same-day delivery) made the test realistic.
 - **False positives:** A hard block on anything untraceable would break legitimate edge cases, such as a shop that really did change its address. Turning the block into an approval request made the system safe and still usable.
 - **Free-tier limits:** Different Gemini models have very different daily allowances, so the tools now detect daily-quota errors and stop instead of retrying.
 
